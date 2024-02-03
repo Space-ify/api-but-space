@@ -1,0 +1,26 @@
+
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "Jayden Pyles", email = "jpylesbusiness@gmail.com"},
+]
+dependencies = [
+    "edgedb>=1.8.0",
+    "fastapi>=0.109.1",
+    "uvicorn>=0.27.0.post1",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.1",
+]
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+[tool.isort]
+length_sort = "1"
+profile = "black"
+sections = "STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
+import_heading_stdlib = "STL"
+import_heading_thirdparty = "PDM"
+import_heading_firstparty = "LOCAL"
+import_heading_localfolder = "LOCAL"
