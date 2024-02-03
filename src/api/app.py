@@ -1,3 +1,6 @@
+# STL
+import os
+
 # PDM
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -6,7 +9,7 @@ from fastapi import FastAPI
 from .routes.EdgeDBRoutes import edgedb_router
 from .routes.SpotifyRoutes import spotify_router
 
-load_dotenv()
+load_dotenv(".env")
 app = FastAPI()
 
 app.include_router(edgedb_router)

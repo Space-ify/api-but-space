@@ -1,2 +1,0 @@
-# STL
-import os
