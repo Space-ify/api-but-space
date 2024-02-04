@@ -4,8 +4,10 @@ import re
 # PDM
 import requests
 from fastapi import Request, APIRouter
+from starlette.responses import FileResponse
 
 # LOCAL
+from api.utils import image_to_base64_string
 from api.spotify.Endpoints import Playlist, Endpoints
 from api.spotify.SpotifyClient import SpotifyClient
 
@@ -13,6 +15,8 @@ spotify_router = APIRouter()
 
 spotify = SpotifyClient()
 spotify.auth.generate_authorization_token()
+
+img_data = image_to_base64_string("./images/test.png")
 
 test_data = [
     {
@@ -24,7 +28,7 @@ test_data = [
         "speed": 0.46085133373814036,
         "offset": 3.482799921154449,
         "rotationSpeed": 0.022596633190025132,
-        "textureMap": "Texture1",
+        "textureMap": img_data,
     },
     {
         "id": 1,
@@ -35,7 +39,7 @@ test_data = [
         "speed": 0.20200118740156534,
         "offset": 4.406875651482467,
         "rotationSpeed": 0.016165443883576602,
-        "textureMap": "Texture2",
+        "textureMap": img_data,
     },
     {
         "id": 2,
@@ -46,7 +50,7 @@ test_data = [
         "speed": 0.5275380391629294,
         "offset": 2.8235732227211616,
         "rotationSpeed": 0.02174475572870173,
-        "textureMap": "Texture3",
+        "textureMap": img_data,
     },
     {
         "id": 3,
@@ -57,7 +61,7 @@ test_data = [
         "speed": 0.5340610153477514,
         "offset": 3.934133842877386,
         "rotationSpeed": 0.025821059626857164,
-        "textureMap": "Texture4",
+        "textureMap": img_data,
     },
     {
         "id": 4,
@@ -68,7 +72,7 @@ test_data = [
         "speed": 0.3768739883398593,
         "offset": 1.8491380629579632,
         "rotationSpeed": 0.021119579521238392,
-        "textureMap": "Texture5",
+        "textureMap": img_data,
     },
     {
         "id": 5,
@@ -79,7 +83,7 @@ test_data = [
         "speed": 0.33191116037862867,
         "offset": 0.6022026892915877,
         "rotationSpeed": 0.012529780287854503,
-        "textureMap": "Texture6",
+        "textureMap": img_data,
     },
 ]
 
