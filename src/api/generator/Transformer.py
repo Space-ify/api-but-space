@@ -2,7 +2,9 @@
 import os
 import json
 import math
+import concurrent.futures
 import random
+import threading
 
 # PDM
 import cv2
@@ -14,7 +16,6 @@ from sklearn.cluster import KMeans
 # LOCAL
 import api.utils as utils
 
-
 class Transformer:
     def __init__(self, playlist) -> None:
         self.tracklist = []
@@ -24,21 +25,26 @@ class Transformer:
     def translatePlaylist(self, playlist) -> None:
         tracks = playlist.get("tracks", {}).get("items", {})
 
-        for i, track in enumerate(tracks):
-            trackData, output_path = self.planet_to_data(track.get("track", {}), i)
-            self.tracklist.append(trackData)
-            # print(f"new track data: " + trackData)
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = [executor.submit(self.process_track, track, i) for i, track in enumerate(tracks)]
 
-            os.remove(output_path)
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    trackData, output_path = future.result()
+                    self.tracklist.append(trackData)
+                    os.remove(output_path)
+                except Exception as e:
+                    print(f"Error processing track: {e}")
 
-    def planet_to_data(self, track, i):
-        pop = pop_to_pop(track.get("popularity", {}))
-        size = get_planet_size(pop)
+    def process_track(self, track, i):
+        thread_id = threading.current_thread().ident
+        # print(track.get("popularity", {}))
+        # print(track.keys())
+        track = track.get("track",{})
+        # print(track.keys())
 
-        get_planet_size(pop_to_pop(1))
-        get_planet_size(pop_to_pop(20))
-        get_planet_size(pop_to_pop(50))
-        get_planet_size(pop_to_pop(100))
+        population = pop_to_pop(track.get("popularity", {}))
+        size = get_planet_size(population)
 
         name = track.get("name", {})
         artist_name = track.get("artists", {})[0].get("name", {})
@@ -46,7 +52,7 @@ class Transformer:
 
         album_img = track.get("album").get("images")[0].get("url")
 
-        save_path = (f"{random.randrange(0,100)}") + ".jpeg"
+        save_path = (f"{thread_id}") + ".jpeg"
 
         download_image(album_img, save_path)
         downscale(save_path, save_path, 0.1)
@@ -71,6 +77,9 @@ class Transformer:
 
         textureMap = utils.image_to_base64_string(save_path)
 
+        preview = track.get("preview_url")
+        print(preview)
+
         track_as_dict = {
             "id": i,
             "size": size,
@@ -82,22 +91,86 @@ class Transformer:
             "offset": random.randint(0, 10),
             "xRadius": (i * 4) + 6,
             "is_explicit": is_explicit,
-            "population": pop,
+            "population": population,
+            "preview": preview,
+            "image_url": album_img
         }
 
         return track_as_dict, save_path
 
+    # def planet_to_data(self, track, i):
+
+    #     print(track)
+
+    #     pop = pop_to_pop(track.get("popularity", {}))
+    #     size = get_planet_size(pop)
+
+    #     # get_planet_size(pop_to_pop(1))
+    #     # get_planet_size(pop_to_pop(20))
+    #     # get_planet_size(pop_to_pop(50))
+    #     # get_planet_size(pop_to_pop(100))
+
+    #     name = track.get("name", {})
+    #     artist_name = track.get("artists", {})[0].get("name", {})
+    #     is_explicit = track.get("explicit", {})
+
+    #     album_img = track.get("album").get("images")[0].get("url")
+
+    #     save_path = (f"{random.randrange(0,100)}") + ".jpeg"
+
+    #     download_image(album_img, save_path)
+    #     downscale(save_path, save_path, 0.1)
+
+    #     top_colors = get_top_colors(save_path, 3)
+    #     # if top_colors.any(): print("Top colors:", top_colors)
+
+    #     utils.create_elliptical_gradient(
+    #         512,
+    #         256,
+    #         tuple(top_colors[0]),
+    #         tuple(top_colors[1]),
+    #         tuple(top_colors[2]),
+    #         save_path,
+    #     )
+
+    #     texture_path = random_texture()
+    #     utils.color_multiply(save_path, texture_path, save_path)
+
+    #     song_length = track.get("duration_ms", {})
+    #     speed = determineSpeed(song_length)
+
+    #     textureMap = utils.image_to_base64_string(save_path)
+
+    #     preview = track.get("preview_url")
+    #     print(preview)
+
+    #     track_as_dict = {
+    #         "id": i,
+    #         "size": size,
+    #         "speed": speed,
+    #         "name": name,
+    #         "artists": artist_name,
+    #         "textureMap": textureMap,
+    #         "rotationSpeed": (random.randrange(15000, 25000) / 1000000),
+    #         "offset": random.randint(0, 10),
+    #         "xRadius": (i * 4) + 6,
+    #         "is_explicit": is_explicit,
+    #         "population": pop,
+    #         "preview": preview
+    #     }
+
+    #     return track_as_dict, save_path
+
 
 def get_planet_size(value, min_value=9000, max_value=10000000000):
     dec = (value - min_value) / (max_value - min_value)
-    # print(f"dec: {dec} \n")
+
     if dec < 0.3:
         norm = dec + (0.3 - dec) / 2 + (random.randrange(1, 5) * 0.1) + 0.2
     elif dec > 0.8:
         norm = dec - (dec - 0.8) / 2 + (random.randrange(1, 5) * 0.1) + 0.2
     else:
         norm = dec + 0.2
-    # print(f"norm: {norm} \n")
 
     return norm
 
@@ -193,10 +266,8 @@ def main():
 
     with open("test_playlist.json", "r") as f:
         data = f.read()
-        # print(data)
 
     playlist = json.loads(data)
-    # print(playlist)
     t = Transformer(playlist)
 
 
