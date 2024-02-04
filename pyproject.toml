@@ -13,6 +13,11 @@ dependencies = [
     "requests>=2.31.0",
     "python-dotenv>=1.0.1",
     "pillow>=10.2.0",
+    "numpy>=1.26.3",
+    "sklearn>=0.0.post12",
+    "opencv-python>=4.9.0.80",
+    "scikit-learn>=1.4.0",
+    "opencv-python-headless>=4.9.0.80",
 ]
 requires-python = ">=3.10"
 license = {text = "MIT"}
