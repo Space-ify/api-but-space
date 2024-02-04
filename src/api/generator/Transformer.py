@@ -1,5 +1,6 @@
 # STL
 import math, random
+import os
 import numpy as np
 import json
 import requests
@@ -16,50 +17,67 @@ class Transformer:
     def __init__(self,playlist) -> None:
         self.tracklist = []
         self.translatePlaylist(playlist)
+        # print(self.tracklist)
 
 
     def translatePlaylist(self,playlist) -> None:
 
         tracks = playlist.get("tracks", {}).get("items",{})
 
-        for track in tracks:
+        for i,track in enumerate(tracks):
 
-            trackData = self.__planetToData(track.get("track",{}))
+            trackData, output_path = self.planet_to_data(track.get("track",{}),i)
             self.tracklist.append(trackData)
             # print(f"new track data: " + trackData)
-        pass
+            
+            os.remove(output_path)
 
-    
-    def __planetToData(self,track):
-        # print(track)
+    def planet_to_data(self,track,i):
 
-        details = track
         pop = pop_to_pop(track.get("popularity",{}))
         name = track.get("name",{})
-        artist_name = track.get("artists",{})
+        artist_name = track.get("artists",{})[0].get("name",{})
         is_explicit = track.get("explicit",{})
 
         album_img = track.get("album").get("images")[0].get("url")
 
-        r = random.randrange(0,100)
-        save_path = (f"{r}") + ".jpeg"
+        save_path = (f"{random.randrange(0,100)}") + ".jpeg"
 
         download_image(album_img, save_path)
         downscale(save_path, save_path, 0.1)
 
         top_colors = get_top_colors(save_path,3)
-        if top_colors.any(): print("Top colors:", top_colors)
+        # if top_colors.any(): print("Top colors:", top_colors)
 
         utils.create_elliptical_gradient(512,256,tuple(top_colors[0]), tuple(top_colors[1]), tuple(top_colors[2]),save_path)
 
         texture_path = random_texture()
         utils.color_multiply(save_path,texture_path, save_path)
 
-        return track
+        song_length = track.get("duration_ms",{})
+        speed = determineSpeed(song_length)
+
+        textureMap = utils.image_to_base64_string(save_path)
+
+        track_as_dict = {"id": i,
+                        "size" :pop/1000000000,
+                        "speed":speed,
+                        "name":name,
+                        "artists":artist_name,
+                        "textureMap":textureMap,
+                        "rotationSpeed":(random.randrange(15000,25000)/1000000),
+                        "offset":random.randint(0,10),
+                        "xRadius":(i*4)+6,
+                        "is_explicit":is_explicit,
+                        }
+
+        return track_as_dict, save_path
     
 
 
+def determineSpeed(ms):
 
+    return 0.005
 
 
 
@@ -69,6 +87,7 @@ def random_texture():
     input_str = (f"textures/{n}.jpg")
     out_str = (f"textures/{n}.1.jpg")
     downscale(input_str,out_str,1/4)
+
     return out_str
 
 
@@ -90,14 +109,11 @@ def pop_to_pop(pop):
     tens = max(10,10**(pop//20))
     r = random.randrange(900000000,1000000000)/1000000
     population = int(pop*r*tens)
-    # print(f" {pop} = pop:" + str(population))
+
     return population
 
 
 def get_top_colors(image_url, num_colors):
-
-    # response = requests.get(image_url)
-    # print(response)
 
     image = cv2.imread(image_url)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -132,7 +148,7 @@ def create_rgb_gradient(color1, color2, color3, height):
 
     gradient_image = Image.new('RGB', (width, height))
 
-    pixels = np.zeros((height, width, 3), dtype=np.uint8)
+    # pixels = np.zeros((height, width, 3), dtype=np.uint8)
 
     for y in range(height):
         ratio = y / (height - 1)
