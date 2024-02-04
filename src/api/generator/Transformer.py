@@ -157,14 +157,9 @@ def get_top_colors(image_url, num_colors):
 
 def downscale(input, output, factor):
     original_image = Image.open(input)
-
-    new_width = int(original_image.width * factor)
-    new_height = int(original_image.height * factor)
-
-    downscaled_image = original_image.resize((new_width, new_height), Image.LANCZOS)
+    new_size = (int(original_image.width * factor), int(original_image.height * factor))
+    downscaled_image = original_image.resize(new_size, Image.LANCZOS)
     downscaled_image.save(output)
-
-    pass
 
 
 def create_rgb_gradient(color1, color2, color3, height):
@@ -172,7 +167,6 @@ def create_rgb_gradient(color1, color2, color3, height):
 
     gradient_image = Image.new("RGB", (width, height))
 
-    # pixels = np.zeros((height, width, 3), dtype=np.uint8)
 
     for y in range(height):
         ratio = y / (height - 1)
