@@ -20,7 +20,6 @@ class Transformer:
     def __init__(self, playlist) -> None:
         self.tracklist = []
         self.translatePlaylist(playlist)
-        # print(self.tracklist)
 
     def translatePlaylist(self, playlist) -> None:
         tracks = playlist.get("tracks", {}).get("items", {})
@@ -38,17 +37,14 @@ class Transformer:
 
     def process_track(self, track, i):
         thread_id = threading.current_thread().ident
-        # print(track.get("popularity", {}))
-        # print(track.keys())
         track = track.get("track",{})
-        # print(track.keys())
 
         population = pop_to_pop(track.get("popularity", {}))
         size = get_planet_size(population)
 
-        name = track.get("name", {})
-        artist_name = track.get("artists", {})[0].get("name", {})
-        is_explicit = track.get("explicit", {})
+        name = track.get("name")
+        artist_name = track.get("artists")[0].get("name")
+        is_explicit = track.get("explicit")
 
         album_img = track.get("album").get("images")[0].get("url")
 
@@ -58,7 +54,6 @@ class Transformer:
         downscale(save_path, save_path, 0.1)
 
         top_colors = get_top_colors(save_path, 3)
-        # if top_colors.any(): print("Top colors:", top_colors)
 
         utils.create_elliptical_gradient(
             512,
@@ -75,10 +70,11 @@ class Transformer:
         song_length = track.get("duration_ms", {})
         speed = determineSpeed(song_length)
 
+        album = track.get("album").get("name")
+
         textureMap = utils.image_to_base64_string(save_path)
 
-        preview = track.get("preview_url")
-        print(preview)
+        preview = track.get("preview_url",{})
 
         track_as_dict = {
             "id": i,
@@ -88,78 +84,16 @@ class Transformer:
             "artists": artist_name,
             "textureMap": textureMap,
             "rotationSpeed": (random.randrange(15000, 25000) / 1000000),
-            "offset": random.randint(0, 10),
+            "offset": random.randint(0, 100),
             "xRadius": (i * 4) + 6,
             "is_explicit": is_explicit,
             "population": population,
             "preview": preview,
-            "image_url": album_img
+            "image_url": album_img,
+            "album":album
         }
 
         return track_as_dict, save_path
-
-    # def planet_to_data(self, track, i):
-
-    #     print(track)
-
-    #     pop = pop_to_pop(track.get("popularity", {}))
-    #     size = get_planet_size(pop)
-
-    #     # get_planet_size(pop_to_pop(1))
-    #     # get_planet_size(pop_to_pop(20))
-    #     # get_planet_size(pop_to_pop(50))
-    #     # get_planet_size(pop_to_pop(100))
-
-    #     name = track.get("name", {})
-    #     artist_name = track.get("artists", {})[0].get("name", {})
-    #     is_explicit = track.get("explicit", {})
-
-    #     album_img = track.get("album").get("images")[0].get("url")
-
-    #     save_path = (f"{random.randrange(0,100)}") + ".jpeg"
-
-    #     download_image(album_img, save_path)
-    #     downscale(save_path, save_path, 0.1)
-
-    #     top_colors = get_top_colors(save_path, 3)
-    #     # if top_colors.any(): print("Top colors:", top_colors)
-
-    #     utils.create_elliptical_gradient(
-    #         512,
-    #         256,
-    #         tuple(top_colors[0]),
-    #         tuple(top_colors[1]),
-    #         tuple(top_colors[2]),
-    #         save_path,
-    #     )
-
-    #     texture_path = random_texture()
-    #     utils.color_multiply(save_path, texture_path, save_path)
-
-    #     song_length = track.get("duration_ms", {})
-    #     speed = determineSpeed(song_length)
-
-    #     textureMap = utils.image_to_base64_string(save_path)
-
-    #     preview = track.get("preview_url")
-    #     print(preview)
-
-    #     track_as_dict = {
-    #         "id": i,
-    #         "size": size,
-    #         "speed": speed,
-    #         "name": name,
-    #         "artists": artist_name,
-    #         "textureMap": textureMap,
-    #         "rotationSpeed": (random.randrange(15000, 25000) / 1000000),
-    #         "offset": random.randint(0, 10),
-    #         "xRadius": (i * 4) + 6,
-    #         "is_explicit": is_explicit,
-    #         "population": pop,
-    #         "preview": preview
-    #     }
-
-    #     return track_as_dict, save_path
 
 
 def get_planet_size(value, min_value=9000, max_value=10000000000):
@@ -176,7 +110,7 @@ def get_planet_size(value, min_value=9000, max_value=10000000000):
 
 
 def determineSpeed(ms):
-    return 0.05
+    return random.randrange(75,100)/1000
 
 
 def random_texture():
