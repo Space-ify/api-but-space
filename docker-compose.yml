@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  api:
+    build:
+      context: "."
+      dockerfile: "./Dockerfile"
+    container_name: "api-but-space"
+    networks:
+      - "spaceify"
+networks:
+  spaceify:
+    external: true
