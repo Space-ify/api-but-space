@@ -63,7 +63,6 @@ class Transformer:
             save_path,
         )
 
-
         texture_path = random_texture()
         utils.color_multiply(save_path, texture_path, save_path)
 
@@ -83,26 +82,28 @@ class Transformer:
             "offset": random.randint(0, 10),
             "xRadius": (i * 4) + 6,
             "is_explicit": is_explicit,
-            "population": pop
+            "population": pop,
         }
 
         return track_as_dict, save_path
+
 
 def get_planet_size(value, min_value=9000, max_value=10000000000):
     dec = (value - min_value) / (max_value - min_value)
     # print(f"dec: {dec} \n")
     if dec < 0.3:
-        norm = dec + (0.3-dec)/1.5 + (random.randrange(1,5)*0.01)
+        norm = dec + (0.3 - dec) / 2 + (random.randrange(1, 5) * 0.1) + 0.2
     elif dec > 0.8:
-        norm = dec - (dec-0.8)/1.5 - (random.randrange(1,5)*0.01)
-    else: norm = dec
+        norm = dec - (dec - 0.8) / 2 + (random.randrange(1, 5) * 0.1) + 0.2
+    else:
+        norm = dec + 0.2
     # print(f"norm: {norm} \n")
 
     return norm
 
 
 def determineSpeed(ms):
-    return 0.005
+    return 0.05
 
 
 def random_texture():
