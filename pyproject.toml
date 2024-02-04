@@ -30,3 +30,6 @@ import_heading_stdlib = "STL"
 import_heading_thirdparty = "PDM"
 import_heading_firstparty = "LOCAL"
 import_heading_localfolder = "LOCAL"
+
+[tool.setuptools]
+packages = ["api"]
