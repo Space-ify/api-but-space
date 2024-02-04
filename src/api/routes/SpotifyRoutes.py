@@ -18,7 +18,7 @@ spotify = SpotifyClient()
 spotify.auth.generate_authorization_token()
 
 
-@spotify_router.post("/spotify/playlist")
+@spotify_router.post("/api/spotify/playlist")
 async def get_playlist(request: Request):
     res = await request.json()
     assert res.get("url")
