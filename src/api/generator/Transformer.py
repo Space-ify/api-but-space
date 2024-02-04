@@ -33,6 +33,8 @@ class Transformer:
 
     def planet_to_data(self, track, i):
         pop = pop_to_pop(track.get("popularity", {}))
+        size = get_planet_size(pop)
+
         name = track.get("name", {})
         artist_name = track.get("artists", {})[0].get("name", {})
         is_explicit = track.get("explicit", {})
@@ -56,6 +58,7 @@ class Transformer:
             save_path,
         )
 
+
         texture_path = random_texture()
         utils.color_multiply(save_path, texture_path, save_path)
 
@@ -66,7 +69,7 @@ class Transformer:
 
         track_as_dict = {
             "id": i,
-            "size": pop / 100000000,
+            "size": size,
             "speed": speed,
             "name": name,
             "artists": artist_name,
@@ -78,6 +81,14 @@ class Transformer:
         }
 
         return track_as_dict, save_path
+
+
+def get_planet_size(pop):
+    print(pop)
+    norm = utils.normalize(pop,8000,100000000)
+    print(norm)
+
+    return norm
 
 
 def determineSpeed(ms):
@@ -169,7 +180,6 @@ def create_rgb_gradient(color1, color2, color3, height):
 def main():
     data = {}
 
-    # print("_")
     with open("test_playlist.json", "r") as f:
         data = f.read()
         # print(data)
@@ -179,4 +189,5 @@ def main():
     t = Transformer(playlist)
 
 
+if __name__ == "__main__":
     main()

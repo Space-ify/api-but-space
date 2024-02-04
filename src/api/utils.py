@@ -79,3 +79,8 @@ def create_elliptical_gradient(width, height, color1, color2, color3, output_pat
             draw.point((x, y), (r, g, b))
 
     image.save(output_path)
+
+
+def normalize(pop, min_value, max_value):
+    normalized_value = (pop - min_value) / (max_value - min_value)
+    return normalized_value
