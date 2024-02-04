@@ -9,6 +9,7 @@ from starlette.responses import FileResponse
 # LOCAL
 from api.utils import image_to_base64_string
 from api.spotify.Endpoints import Playlist, Endpoints
+from api.generator.Transformer import Transformer
 from api.spotify.SpotifyClient import SpotifyClient
 
 spotify_router = APIRouter()
@@ -94,14 +95,14 @@ test_data = [
 ]
 
 
-@spotify_router.get("/spotify/playlist")
+@spotify_router.post("/spotify/playlist")
 async def get_playlist(request: Request):
     res = await request.json()
     assert res.get("url")
 
     url = res.get("url")
 
-    ID = re.search(r"/playlist/([^?]+)", url)
+    ID = re.search(r"/playlist/([^?]+)", url.get("query"))
     if ID:
         ID = ID.group(1)
 
@@ -112,7 +113,10 @@ async def get_playlist(request: Request):
     playlist = f"{playlist.PLAYLIST.value}/{ID}"
 
     res = requests.get(playlist, headers=headers)
-    return res.json()
+
+    t = Transformer(res.json())
+
+    return {"items": t.tracklist}
 
 
 @spotify_router.get("/spotify/test")
