@@ -50,8 +50,7 @@ class Transformer:
         top_colors = get_top_colors(save_path,3)
         if top_colors.any(): print("Top colors:", top_colors)
 
-        gradient_image = create_rgb_gradient(tuple(top_colors[0]), tuple(top_colors[1]), tuple(top_colors[2]), 128*2)
-        utils.save_image_obj(gradient_image,save_path)
+        utils.create_elliptical_gradient(512,256,tuple(top_colors[0]), tuple(top_colors[1]), tuple(top_colors[2]),save_path)
 
         texture_path = random_texture()
         utils.color_multiply(save_path,texture_path, save_path)
