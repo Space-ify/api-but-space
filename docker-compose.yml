@@ -5,6 +5,8 @@ services:
       context: "."
       dockerfile: "./Dockerfile"
     container_name: "api-but-space"
+    ports:
+      - "8000:8000"
     networks:
       - "spaceify"
 networks:
