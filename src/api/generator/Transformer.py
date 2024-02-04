@@ -92,7 +92,8 @@ class Transformer:
             "xRadius": (i * 4) + 6,
             "is_explicit": is_explicit,
             "population": population,
-            "preview": preview
+            "preview": preview,
+            "image_url": album_img
         }
 
         return track_as_dict, save_path
