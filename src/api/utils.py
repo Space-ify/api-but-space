@@ -1,5 +1,5 @@
 # STL
-import base64
+import base64, math
 from PIL import Image, ImageDraw
 
 
@@ -52,4 +52,30 @@ def color_multiply(image1_path, image2_path, output_path):
 
     multiplied_image.save("images/test.png")
 
+def create_elliptical_gradient(width, height, color1, color2, color3, output_path):
+    image = Image.new("RGB", (width, height))
+    draw = ImageDraw.Draw(image)
 
+    center_x, center_y = width // 2, height // 2
+    max_distance = math.sqrt((width / 2) ** 2 + (height / 2) ** 2)
+
+    for y in range(height):
+        for x in range(width):
+            distance_x = abs(x - center_x)
+            distance_y = abs(y - center_y)
+            distance = math.sqrt((distance_x / (width / 2)) ** 2 + (distance_y / (height / 2)) ** 2)
+
+            if distance <= 1:
+                gradient = distance
+                r = int(color1[0] * (1 - gradient) + color2[0] * gradient)
+                g = int(color1[1] * (1 - gradient) + color2[1] * gradient)
+                b = int(color1[2] * (1 - gradient) + color2[2] * gradient)
+            else:
+                gradient = (distance - 1) / (max_distance - 1)
+                r = int(color2[0] * (1 - gradient) + color3[0] * gradient)
+                g = int(color2[1] * (1 - gradient) + color3[1] * gradient)
+                b = int(color2[2] * (1 - gradient) + color3[2] * gradient)
+
+            draw.point((x, y), (r, g, b))
+
+    image.save(output_path)
