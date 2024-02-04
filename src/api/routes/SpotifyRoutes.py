@@ -29,6 +29,7 @@ test_data = [
         "offset": 3.482799921154449,
         "rotationSpeed": 0.022596633190025132,
         "textureMap": img_data,
+        "name": "song name",
     },
     {
         "id": 1,
@@ -40,6 +41,7 @@ test_data = [
         "offset": 4.406875651482467,
         "rotationSpeed": 0.016165443883576602,
         "textureMap": img_data,
+        "name": "song name",
     },
     {
         "id": 2,
@@ -51,6 +53,7 @@ test_data = [
         "offset": 2.8235732227211616,
         "rotationSpeed": 0.02174475572870173,
         "textureMap": img_data,
+        "name": "song name",
     },
     {
         "id": 3,
@@ -62,6 +65,7 @@ test_data = [
         "offset": 3.934133842877386,
         "rotationSpeed": 0.025821059626857164,
         "textureMap": img_data,
+        "name": "song name",
     },
     {
         "id": 4,
@@ -73,6 +77,7 @@ test_data = [
         "offset": 1.8491380629579632,
         "rotationSpeed": 0.021119579521238392,
         "textureMap": img_data,
+        "name": "song name",
     },
     {
         "id": 5,
@@ -84,6 +89,7 @@ test_data = [
         "offset": 0.6022026892915877,
         "rotationSpeed": 0.012529780287854503,
         "textureMap": img_data,
+        "name": "song name",
     },
 ]
 
