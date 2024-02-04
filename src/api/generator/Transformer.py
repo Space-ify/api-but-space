@@ -5,7 +5,7 @@ import json
 import requests
 import cv2
 from sklearn.cluster import KMeans
-
+import api.utils as utils
 
 
 from PIL import Image, ImageDraw
@@ -34,7 +34,7 @@ class Transformer:
         # print(track)
 
         details = track
-        pop = popToPop(track.get("popularity",{}))
+        pop = pop_to_pop(track.get("popularity",{}))
         name = track.get("name",{})
         artist_name = track.get("artists",{})
         is_explicit = track.get("explicit",{})
@@ -50,9 +50,11 @@ class Transformer:
         top_colors = get_top_colors(save_path,3)
         if top_colors.any(): print("Top colors:", top_colors)
 
-        gradient_image = create_rgb_gradient(tuple(top_colors[0]), tuple(top_colors[1]), tuple(top_colors[2]), 64)
-        writeToBinary(gradient_image,save_path)
+        gradient_image = create_rgb_gradient(tuple(top_colors[0]), tuple(top_colors[1]), tuple(top_colors[2]), 128*2)
+        utils.save_image_obj(gradient_image,save_path)
 
+        texture_path = random_texture()
+        utils.color_multiply(save_path,texture_path, save_path)
 
         return track
     
@@ -62,6 +64,13 @@ class Transformer:
 
 
 
+def random_texture():
+
+    n = random.randrange(1,5)
+    input_str = (f"textures/{n}.jpg")
+    out_str = (f"textures/{n}.1.jpg")
+    downscale(input_str,out_str,1/4)
+    return out_str
 
 
 
@@ -77,7 +86,7 @@ def download_image(url, save_path):
 
 
 
-def popToPop(pop):
+def pop_to_pop(pop):
 
     tens = max(10,10**(pop//20))
     r = random.randrange(900000000,1000000000)/1000000
@@ -119,27 +128,24 @@ def downscale(input, output, factor):
     pass
 
 
-def create_rgb_gradient(color1, color2, color3, size):
-    # Create a blank image with the specified width and height
-    gradient_image = Image.new('RGB', (size, size))
+def create_rgb_gradient(color1, color2, color3, height):
+    width = 2 * height
 
-    print(color1)
+    gradient_image = Image.new('RGB', (width, height))
 
-    # Create a NumPy array to hold the pixel data
-    pixels = np.zeros((size, size, 3), dtype=np.uint8)
+    pixels = np.zeros((height, width, 3), dtype=np.uint8)
 
-    # Generate a gradient based on the specified RGB colors
-    for y in range(size):
-        ratio = y / (size - 1)
+    for y in range(height):
+        ratio = y / (height - 1)
         intermediate_color1 = np.array(color1) * (1 - ratio) + np.array(color2) * ratio
         intermediate_color2 = np.array(color2) * (1 - ratio) + np.array(color3) * ratio
 
-        for x in range(size):
-            ratio_x = x / (size - 1)
+        for x in range(width):
+            ratio_x = x / (width - 1)
             final_color = intermediate_color1 * (1 - ratio_x) + intermediate_color2 * ratio_x
-            final_color = [int(final_color[0]),int(final_color[1]),int(final_color[2])]
+            final_color = [int(final_color[0]), int(final_color[1]), int(final_color[2])]
             final_color = tuple(final_color)
-            gradient_image.putpixel((x,y),final_color)
+            gradient_image.putpixel((x, y), final_color)
 
     return gradient_image
 
