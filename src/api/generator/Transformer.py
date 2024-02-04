@@ -66,7 +66,7 @@ class Transformer:
 
         track_as_dict = {
             "id": i,
-            "size": pop / 1000000000,
+            "size": pop / 100000000,
             "speed": speed,
             "name": name,
             "artists": artist_name,
@@ -179,5 +179,4 @@ def main():
     t = Transformer(playlist)
 
 
-if __name__ == "__main__":
     main()
