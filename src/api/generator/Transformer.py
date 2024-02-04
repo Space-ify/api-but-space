@@ -60,7 +60,7 @@ class Transformer:
         textureMap = utils.image_to_base64_string(save_path)
 
         track_as_dict = {"id": i,
-                        "size" :pop/1000000000,
+                        "size" :pop/100000000,
                         "speed":speed,
                         "name":name,
                         "artists":artist_name,
