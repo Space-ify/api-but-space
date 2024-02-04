@@ -35,6 +35,11 @@ class Transformer:
         pop = pop_to_pop(track.get("popularity", {}))
         size = get_planet_size(pop)
 
+        get_planet_size(pop_to_pop(1))
+        get_planet_size(pop_to_pop(20))
+        get_planet_size(pop_to_pop(50))
+        get_planet_size(pop_to_pop(100))
+
         name = track.get("name", {})
         artist_name = track.get("artists", {})[0].get("name", {})
         is_explicit = track.get("explicit", {})
@@ -78,15 +83,20 @@ class Transformer:
             "offset": random.randint(0, 10),
             "xRadius": (i * 4) + 6,
             "is_explicit": is_explicit,
+            "population": pop
         }
 
         return track_as_dict, save_path
 
-
-def get_planet_size(pop):
-    print(pop)
-    norm = utils.normalize(pop,8000,100000000)
-    print(norm)
+def get_planet_size(value, min_value=9000, max_value=10000000000):
+    dec = (value - min_value) / (max_value - min_value)
+    # print(f"dec: {dec} \n")
+    if dec < 0.3:
+        norm = dec + (0.3-dec)/1.5 + (random.randrange(1,5)*0.01)
+    elif dec > 0.8:
+        norm = dec - (dec-0.8)/1.5 - (random.randrange(1,5)*0.01)
+    else: norm = dec
+    # print(f"norm: {norm} \n")
 
     return norm
 
