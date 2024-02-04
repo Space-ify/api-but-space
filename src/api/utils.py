@@ -1,5 +1,6 @@
 # STL
 import base64, math
+import numpy as np
 from PIL import Image, ImageDraw
 
 
@@ -32,50 +33,34 @@ def crop_to_2_1_aspect_ratio(input_path, output_path):
 
 def color_multiply(image1_path, image2_path, output_path):
     img1 = Image.open(image1_path)
-    img2 = Image.open(image2_path)
+    img2 = Image.open(image2_path).resize(img1.size)
 
-    img2 = img2.resize(img1.size)
+    weight1 = 0.75
+    weight2 = 0.25
 
-    img1 = img1.convert('RGB')
-    img2 = img2.convert('RGB')
+    result = Image.blend(img1, img2, weight2 / (weight1 + weight2))
+    result.save(output_path)
 
-    weight1 = 0.75 
-    weight2 = 0.25 
-
-    multiplied_data = [
-        tuple(int((p1 * weight1 + p2 * weight2) // (weight1 + weight2)) for p1, p2 in zip(data1, data2))
-        for data1, data2 in zip(img1.getdata(), img2.getdata())
-    ]
-
-    multiplied_image = Image.new('RGB', img1.size)
-    multiplied_image.putdata(multiplied_data)
-
-    multiplied_image.save("images/test.png")
 
 def create_elliptical_gradient(width, height, color1, color2, color3, output_path):
-    image = Image.new("RGB", (width, height))
-    draw = ImageDraw.Draw(image)
+    image = np.zeros((height, width, 3), dtype=np.uint8)
 
     center_x, center_y = width // 2, height // 2
-    max_distance = math.sqrt((width / 2) ** 2 + (height / 2) ** 2)
+    max_distance = np.sqrt((width / 2) ** 2 + (height / 2) ** 2)
 
     for y in range(height):
         for x in range(width):
             distance_x = abs(x - center_x)
             distance_y = abs(y - center_y)
-            distance = math.sqrt((distance_x / (width / 2)) ** 2 + (distance_y / (height / 2)) ** 2)
+            distance = np.sqrt((distance_x / (width / 2)) ** 2 + (distance_y / (height / 2)) ** 2)
 
             if distance <= 1:
                 gradient = distance
-                r = int(color1[0] * (1 - gradient) + color2[0] * gradient)
-                g = int(color1[1] * (1 - gradient) + color2[1] * gradient)
-                b = int(color1[2] * (1 - gradient) + color2[2] * gradient)
+                pixel_color = tuple(int(color1[i] * (1 - gradient) + color2[i] * gradient) for i in range(3))
             else:
                 gradient = (distance - 1) / (max_distance - 1)
-                r = int(color2[0] * (1 - gradient) + color3[0] * gradient)
-                g = int(color2[1] * (1 - gradient) + color3[1] * gradient)
-                b = int(color2[2] * (1 - gradient) + color3[2] * gradient)
+                pixel_color = tuple(int(color2[i] * (1 - gradient) + color3[i] * gradient) for i in range(3))
 
-            draw.point((x, y), (r, g, b))
+            image[y, x, :] = pixel_color
 
-    image.save(output_path)
+    Image.fromarray(image).save(output_path)
