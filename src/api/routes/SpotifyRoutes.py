@@ -15,11 +15,12 @@ from api.spotify.SpotifyClient import SpotifyClient
 spotify_router = APIRouter()
 
 spotify = SpotifyClient()
-spotify.auth.generate_authorization_token()
 
 
 @spotify_router.post("/api/spotify/playlist")
 async def get_playlist(request: Request):
+    spotify.auth.generate_authorization_token()
+
     res = await request.json()
     assert res.get("url")
 
@@ -37,6 +38,8 @@ async def get_playlist(request: Request):
 
     res = requests.get(playlist, headers=headers)
 
-    t = Transformer(res.json())
-
-    return {"items": t.tracklist}
+    try:
+        t = Transformer(res.json())
+        return {"items": t.tracklist}
+    except:
+        return {"message": "Error parsing tracks."}

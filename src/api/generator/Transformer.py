@@ -2,9 +2,9 @@
 import os
 import json
 import math
-import concurrent.futures
 import random
 import threading
+import concurrent.futures
 
 # PDM
 import cv2
@@ -16,6 +16,7 @@ from sklearn.cluster import KMeans
 # LOCAL
 import api.utils as utils
 
+
 class Transformer:
     def __init__(self, playlist) -> None:
         self.tracklist = []
@@ -25,7 +26,10 @@ class Transformer:
         tracks = playlist.get("tracks", {}).get("items", {})
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            futures = [executor.submit(self.process_track, track, i) for i, track in enumerate(tracks)]
+            futures = [
+                executor.submit(self.process_track, track, i)
+                for i, track in enumerate(tracks)
+            ]
 
             for future in concurrent.futures.as_completed(futures):
                 try:
@@ -33,11 +37,12 @@ class Transformer:
                     self.tracklist.append(trackData)
                     os.remove(output_path)
                 except Exception as e:
+                    self.tracklist.append({})
                     print(f"Error processing track: {e}")
 
     def process_track(self, track, i):
         thread_id = threading.current_thread().ident
-        track = track.get("track",{})
+        track = track.get("track", {})
 
         population = pop_to_pop(track.get("popularity", {}))
         size = get_planet_size(population)
@@ -64,17 +69,19 @@ class Transformer:
             save_path,
         )
 
-        texture_path = random_texture()
-        utils.color_multiply(save_path, texture_path, save_path)
+        try:
+            texture_path = random_texture()
+            utils.color_multiply(save_path, texture_path, save_path)
+            textureMap = utils.image_to_base64_string(save_path)
+        except:
+            textureMap = ""
 
         song_length = track.get("duration_ms", {})
         speed = determineSpeed(song_length)
 
         album = track.get("album").get("name")
 
-        textureMap = utils.image_to_base64_string(save_path)
-
-        preview = track.get("preview_url",{})
+        preview = track.get("preview_url", {})
 
         track_as_dict = {
             "id": i,
@@ -90,7 +97,7 @@ class Transformer:
             "population": population,
             "preview": preview,
             "image_url": album_img,
-            "album":album
+            "album": album,
         }
 
         return track_as_dict, save_path
@@ -110,7 +117,7 @@ def get_planet_size(value, min_value=9000, max_value=10000000000):
 
 
 def determineSpeed(ms):
-    return random.randrange(75,100)/1000
+    return random.randrange(75, 100) / 1000
 
 
 def random_texture():
@@ -166,7 +173,6 @@ def create_rgb_gradient(color1, color2, color3, height):
     width = 2 * height
 
     gradient_image = Image.new("RGB", (width, height))
-
 
     for y in range(height):
         ratio = y / (height - 1)
