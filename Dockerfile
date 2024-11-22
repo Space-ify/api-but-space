@@ -1,8 +1,8 @@
-FROM python:slim
+FROM python:3.10
 
 WORKDIR /project
 RUN apt-get update && \
-    apt-get install -y gcc ffmpeg libsm6 libxext6
+    apt-get install -y gcc ffmpeg libsm6 libxext6 g++
 
 WORKDIR /project
 
