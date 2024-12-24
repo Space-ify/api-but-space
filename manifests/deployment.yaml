@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spaceify-api
+  namespace: spaceify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spaceify-api
+  template:
+    metadata:
+      labels:
+        app: spaceify-api
+    spec:
+      containers:
+        - name: spaceify-api
+          image: jpyles0524/spaceify-api:latest
+          ports:
+            - containerPort: 8000
+          env:
+          - name: CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: spaceify-secret
+                key: CLIENT_ID
+          - name: CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: spaceify-secret
+                key: CLIENT_SECRET
+          - name: REDIRECT_URI
+            valueFrom:
+              secretKeyRef:
+                name: spaceify-secret
+                key: REDIRECT_URI
+          - name: CODE
+            valueFrom:
+              secretKeyRef:
+                name: spaceify-secret
+                key: CODE
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spaceify-api
+  namespace: spaceify
+spec:
+  selector:
+    app: spaceify-api
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

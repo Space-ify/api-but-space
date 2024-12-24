@@ -4,6 +4,11 @@ services:
     build:
       context: "."
       dockerfile: "./Dockerfile"
+      args:
+        CLIENT_ID: $CLIENT_ID
+        CLIENT_SECRET: $CLIENT_SECRET
+        REDIRECT_URI: $REDIRECT_URI
+        CODE: $CODE
     container_name: "api-but-space"
     ports:
       - "8000:8000"

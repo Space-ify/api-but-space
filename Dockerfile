@@ -9,12 +9,21 @@ WORKDIR /project
 RUN python -m pip --no-cache-dir install pdm
 
 ARG SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
+ARG CLIENT_ID
+ARG CLIENT_SECRET
+ARG REDIRECT_URI
+ARG CODE
+
+ENV CLIENT_ID=${CLIENT_ID}
+ENV CLIENT_SECRET=${CLIENT_SECRET}
+ENV REDIRECT_URI=${REDIRECT_URI}
+ENV CODE=${CODE}
 
 COPY src/api /project/api
 COPY textures /project/textures
 COPY images /project/images
 
-COPY pyproject.toml pdm.lock .env /project
+COPY pyproject.toml pdm.lock /project
 
 RUN pdm install --frozen-lockfile --no-editable -vv
 
