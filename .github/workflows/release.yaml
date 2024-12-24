@@ -28,4 +28,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/spaceify-frontend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/spaceify-api:latest
